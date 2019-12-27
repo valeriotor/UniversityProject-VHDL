@@ -9,4 +9,13 @@ esempio, 10 cicli di clock), non si riconosce (per qualunque motivo) la seconda 
 apertura si riporta allo stato inziale e la procedura deve ripartire. La cassaforte si apre se e solo se
 le due chiavi sono inserite, e le due sequenze riconosciute entro il tempo limite. L’ordine delle
 serrature non è importante, lo studente può scegliere le sequenze di 4 bit.
+____________________________________________________________________________________________________________________________
+COMMENTI ALLA TRACCIA
 
+il testo non è chiaro e non specifica come la sequenza arriva alla macchina. 
+1 solo bit per volta o un vettore da 4 tutto insieme?
+Se poi si fa l'ipotesi della chiave come TOKEN, questa già contiene la sequenza in ingresso al controllore e pertanto va solo controllato l'input dell utente e confrontato con la password salvata nel token.
+Una miglioria riguardante l'inserimento dei codice può essere il tasto ENTER o INVIO, che manda al controllore la sequenza inserita dall'utente su un bus da 4 bit
+
+le SEQUENZE (PASSWORD) sono generate dalle chiavi del personale, per cui si suppone che queste ultime siano dei TOKEN, dei dispositivi fisici per l'autenticazione a due fattori.
+Inserendo la chiave, l'autenticazione richeide l'inserimento della password associata alla tessera (lo stesso metodo è utilizzato ad esempio per le SIM card attraverso il pin oppure le carte di credito).
