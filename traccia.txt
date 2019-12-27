@@ -1,0 +1,12 @@
+Si realizzi un controllore per apertura di una cassaforte. Il controllore è basato sul riconoscimento
+di due sequenze di 4 bit generate da due chiavi a disposizione di personale di sicurezza. Il
+funzionamento è il seguente. Il primo utente deve inserire la sua chiave in una serratura. I
+controllore di apertura rileva la chiave e si pone in attesa di ricevere una sequenza generata da un
+componente esterno (NOTA: ciò significa che la sequenza è in ingresso al controllore di apertura).
+Il secondo utente deve fare la stessa cosa con la sua chiave, ed il controllore di apertura si
+comporta in maniera analoga. Se viene riconosciuta una sequenza e, entro un tempo limite (per
+esempio, 10 cicli di clock), non si riconosce (per qualunque motivo) la seconda il controllore di
+apertura si riporta allo stato inziale e la procedura deve ripartire. La cassaforte si apre se e solo se
+le due chiavi sono inserite, e le due sequenze riconosciute entro il tempo limite. L’ordine delle
+serrature non è importante, lo studente può scegliere le sequenze di 4 bit.
+
