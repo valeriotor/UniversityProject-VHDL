@@ -6,7 +6,7 @@ Si tratta dell'implementazione in VHDL di un meccanismo di apertura di una cassa
 
 A partecipare al progetto sono:
 
-Pellegrino Mario
+Pellegrino Mario :)
 Saviano Agostino
 Torsiello Valerio
 Vallefuoco Roberto
