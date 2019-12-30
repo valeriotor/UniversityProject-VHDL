@@ -1,5 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -26,28 +27,28 @@ signal counter: integer range 0 to K;
 signal toggle : std_logic;
 
 begin
---nella sensitivity list è aggiunto il segnale di clock
+--nella sensitivity list Ã¨ aggiunto il segnale di clock
 process (clock) begin
 --esegue solo se rileva un fronte di salita 
 if (rising_edge(clock)) then
---se il segnale di reset è alto, allora il contatore deve essere portato a zero e l'uscita
+--se il segnale di reset Ã¨ alto, allora il contatore deve essere portato a zero e l'uscita
 --Finished deve restare bassa
 	if(reset = '1') then
 		counter <= 0;
 		--toggle si abbassa
 		toggle <= '0';
 		Finished <= '0';
---se Start è alto e il contatore è a zero, procede ad incrementare di 1 counter e mantiene bassa l'uscita finished
+--se Start Ã¨ alto e il contatore Ã¨ a zero, procede ad incrementare di 1 counter e mantiene bassa l'uscita finished
 	elsif (Start = '1' and counter = 0) then
 		counter <= counter + 1;
-		--il segnale di start è arrivato correttamente, per cui toggle si alza
+		--il segnale di start Ã¨ arrivato correttamente, per cui toggle si alza
 		toggle <= '1';
 		Finished <= '0';
 --quando counter ha assunto il valore desiderato, finished si alza e counter si riporta a 0
 	elsif(counter = K - 1) then
 		Finished <= '1';
 		counter <= 0;
---se i segnali di start e reset sono entrambi a 0 ed inoltre lo start è arrivato in maniera valida,
+--se i segnali di start e reset sono entrambi a 0 ed inoltre lo start Ã¨ arrivato in maniera valida,
 --il contatore incrementa di uno il valore interno counter	
 	elsif(Start = '0' and reset = '0' and toggle = '1') then
 		counter <= counter + 1;
