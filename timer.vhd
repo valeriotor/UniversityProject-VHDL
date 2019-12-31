@@ -31,26 +31,22 @@ begin
 process (clock) begin
 --esegue solo se rileva un fronte di salita 
 if (rising_edge(clock)) then
---se il segnale di reset è alto, allora il contatore deve essere portato a zero e l'uscita
---Finished deve restare bassa
-	if(reset = '1') then
+	if(reset = '1') then					-- Un reset abbassa sia output che segnali interni
 		counter <= 0;
-		--toggle si abbassa
 		toggle <= '0';
 		Finished <= '0';
---se Start è alto e il contatore è a zero, procede ad incrementare di 1 counter e mantiene bassa l'uscita finished
-	elsif (Start = '1' and counter = 0) then
-		counter <= counter + 1;
-		--il segnale di start è arrivato correttamente, per cui toggle si alza
+	elsif(Start = '1') then				-- Uno start è identico a un reset, eccetto che alza toggle per permettere il conteggio
+		counter <= 0;
 		toggle <= '1';
 		Finished <= '0';
---quando counter ha assunto il valore desiderato, finished si alza e counter si riporta a 0
-	elsif(counter = K - 1) then
+	elsif(counter = K - 1) then		-- Al valore desiderato si alza Finished (e counter si incrementa di nuovo)
 		Finished <= '1';
+		counter <= counter + 1;
+	elsif(counter = K) then				-- Successivamente si effettua un reset del componente.
+		Finished <= '0';
 		counter <= 0;
---se i segnali di start e reset sono entrambi a 0 ed inoltre lo start è arrivato in maniera valida,
---il contatore incrementa di uno il valore interno counter	
-	elsif(Start = '0' and reset = '0' and toggle = '1') then
+		toggle <= '0';
+	elsif(toggle = '1') then			-- Come ultimo caso, si incrementa counter solo se toggle è alto
 		counter <= counter + 1;
 	end if;
 end if;
