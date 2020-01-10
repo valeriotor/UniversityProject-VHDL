@@ -22,7 +22,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -43,21 +43,10 @@ architecture Behavioral of ControlloreSequenze is
 
 type state is (WAITING, READY, STEADY, NO_MATCH, MATCH);
 signal curr_state, next_state : state := WAITING;
-signal timer_start, timer_end : STD_LOGIC := '0';
 signal stored_key : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
-
-component Timer
-	GENERIC (K : INTEGER);
-	PORT 	(Clock : in  STD_LOGIC;
-			Reset : in  STD_LOGIC;
-			Start : in  STD_LOGIC;
-			Finished : out  STD_LOGIC);
-end component;
-			 
+signal counter : integer := 0;
+ 
 begin
-BitTimer : Timer
-	GENERIC MAP(3)
-	PORT MAP	(Clock,Reset,timer_start,timer_end);
 
 Mealy : process (Clock)
 begin
@@ -76,9 +65,8 @@ begin
 					--report "Timer Start/Timer End: " & std_logic'image(timer_start) & "/" & std_logic'image(timer_end);
 				when READY =>
 					--report "Timer Start/Timer End: " & std_logic'image(timer_start) & "/" & std_logic'image(timer_end);
-					if(timer_end = '1') then
+					if(counter = 4) then
 						next_state <= STEADY;
-						--report "Something";
 					end if;
 				when STEADY =>
 					if(EnterCode = '1') then
@@ -108,24 +96,15 @@ begin
 	if(rising_edge(Clock)) then
 		if(Reset = '1' OR EnableKey = '0') then
 			stored_key <= "0000";
-		elsif(curr_state = READY AND timer_end = '0') then
+			counter <= 0;
+		elsif(counter = 4) then
+			counter <= 0;
+		elsif(curr_state = READY) then
 			stored_key <= BitKey & stored_key(3) & stored_key(2) & stored_key(1);
+			counter <= counter + 1;
 		end if;
 	end if;
 end process;
-
-TimerHandler : process (Clock)
-begin
-	if(rising_edge(Clock)) then
-		if(Reset = '1' OR EnableKey = '0') then
-			timer_start <= '0';
-		elsif(curr_state = WAITING) then
-			timer_start <= '1';
-		elsif(timer_start = '1') then
-			timer_start <= '0';
-		end if;
-	end if;
-end process;	
 
 end Behavioral;
 
