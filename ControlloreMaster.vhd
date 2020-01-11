@@ -2,7 +2,7 @@ Library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 
-entity controllore_sub is
+entity ControlloreMaster is
     Port ( 
 			  -- ingressi per ControlloreSequenze1
 			  Bitkey1: in STD_LOGIC;
@@ -21,9 +21,9 @@ entity controllore_sub is
 			  reset : in  STD_LOGIC;
 			  safe_open : out  STD_LOGIC;
 			  timer_reset : out STD_LOGIC);
-end controllore_sub;
+end ControlloreMaster;
 
-architecture Behavioral of controllore_sub is
+architecture Behavioral of ControlloreMaster is
 
 
 -- definizione stati della macchina di Moore
@@ -39,7 +39,7 @@ signal check_key_1,check_key_2 : STD_LOGIC;
 signal timer_end,timer_start : STD_LOGIC;
 
 
--- componenti utilizzati all'interno del controllore_sub
+-- componenti utilizzati all'interno del ControlloreMaster
 component ControlloreSequenze is
     port (Clock, Reset, BitKey, EnableKey, EnterCode: in STD_LOGIC;
              Code: in STD_LOGIC_VECTOR (3 downto 0);
