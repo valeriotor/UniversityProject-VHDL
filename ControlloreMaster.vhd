@@ -62,7 +62,7 @@ C2: ControlloreSequenze
 	port map (Clock=> clock, Reset => reset, BitKey => Bitkey2, Code => code2, EnableKey => Enablekey2, EnterCode => EnterCode2, Success => check_key_2);
 
 T1: Timer 
-	generic map(5000000000)
+	generic map(5000000)
 	port map(Clock => clock, Reset => reset,Start => timer_start,Finished => timer_end);
 
 processo_sincrono:process(clock)
