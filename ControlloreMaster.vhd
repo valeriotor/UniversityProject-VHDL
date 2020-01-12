@@ -129,6 +129,7 @@ timer_reset <= '0';
             
         when S3 =>
             if(check_key_1 = '0' and check_key_2 = '0') then
+		timer_reset <= '1';
                 next_state <= S0;
             else 
                 next_state <= S3;
