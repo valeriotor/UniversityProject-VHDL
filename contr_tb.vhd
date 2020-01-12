@@ -12,29 +12,45 @@ ARCHITECTURE behavior OF contr_tb IS
  
     -- Component Declaration for the Unit Under Test (UUT)
  
-    COMPONENT controllore_sub
+    COMPONENT ControlloreMaster
     PORT(
-         clock : IN  std_logic;
-         reset : IN  std_logic;
-         check_key_1 : IN  std_logic;
-         check_key_2 : IN  std_logic;
-         timer_end : IN  std_logic;
-         timer_start : OUT  std_logic;
-         safe_open : OUT  std_logic;
-         timer_reset : OUT  std_logic
+              -- ingressi per ControlloreSequenze1
+              Bitkey1: in STD_LOGIC;
+              code1: in STD_LOGIC_VECTOR (3 downto 0);
+              Enablekey1: in STD_LOGIC;
+              EnterCode1: in STD_LOGIC;
+              
+              -- ingressi per ControlloreSequenze2
+              Bitkey2: in STD_LOGIC;
+              code2: in STD_LOGIC_VECTOR (3 downto 0) ;
+              Enablekey2: in STD_LOGIC;
+              EnterCode2: in STD_LOGIC;
+              
+              -- ingressi della macchina
+              clock : in  STD_LOGIC;
+              reset : in  STD_LOGIC;
+              --uscisees
+              safe_open : out  STD_LOGIC;
+              timer_reset : out STD_LOGIC
         );
     END COMPONENT;
     
 
    --Inputs
-   signal clock : std_logic := '0';
-   signal reset : std_logic := '0';
-   signal check_key_1 : std_logic := '0';
-   signal check_key_2 : std_logic := '0';
-   signal timer_end : std_logic := '0';
+    signal clock : std_logic := '0';
+    signal reset : std_logic := '0';
+    -- input of ControlloreSequenze1
+    signal Bitkey1 : std_logic := '0';
+    signal code1 : STD_LOGIC_VECTOR (3 downto 0):= (others => '0');
+    signal Enablekey1 : std_logic := '0';
+    signal EnterCode1 : STD_LOGIC :='0';
+    -- input of ControlloreSequenze2
+    signal Bitkey2 : std_logic := '0';
+    signal code2 : STD_LOGIC_VECTOR (3 downto 0):= (others => '0');
+    signal Enablekey2 : std_logic := '0';
+    signal EnterCode2 : STD_LOGIC :='0';
 
- 	--Outputs
-   signal timer_start : std_logic;
+    --Outputs
    signal safe_open : std_logic;
    signal timer_reset : std_logic;
 
@@ -43,14 +59,21 @@ ARCHITECTURE behavior OF contr_tb IS
  
 BEGIN
  
-	-- Instantiate the Unit Under Test (UUT)
-   uut: controllore_sub PORT MAP (
+    -- Instantiate the Unit Under Test (UUT)
+   uut: ControlloreMaster PORT MAP (
           clock => clock,
           reset => reset,
-          check_key_1 => check_key_1,
-          check_key_2 => check_key_2,
-          timer_end => timer_end,
-          timer_start => timer_start,
+          -- input of ControlloreSequenze1
+          Bitkey1 => Bitkey1,
+          code1 => code1,
+          Enablekey1 => Enablekey1,
+          EnterCode1 => EnterCode1,
+          --input of ControlloreSequenze2
+          Bitkey2 => Bitkey2,
+          code2 => code2,
+          Enablekey2 => Enablekey2,
+          EnterCode2 => EnterCode2,
+          --outputs
           safe_open => safe_open,
           timer_reset => timer_reset
         );
@@ -58,46 +81,160 @@ BEGIN
    -- Clock process definitions
    clock_process :process
    begin
-		clock <= '0';
-		wait for clock_period/2;
-		clock <= '1';
-		wait for clock_period/2;
+        clock <= '0';
+        wait for clock_period/2;
+        clock <= '1';
+        wait for clock_period/2;
    end process;
  
 
    -- Stimulus process
    stim_proc: process
-   begin		
+   begin        
       -- hold reset state for 100 ns.
-		reset <= '1';
+        reset <= '1';
       wait for 100 ns;
-		reset <= '0';
-		
+        reset <= '0';
+        
       wait for clock_period*3;
-		
-		timer_end <= '0';
-		check_key_1 <= '1';
-		check_key_2 <= '1';
-		wait for clock_period*1;
---		check_key_2 <= '1';
---		wait for clock_period*5;
+        
+        
+        -- voglio il check_key_1 <= '1';
+        Enablekey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period*2;
+        code1 <= "0110";
+        wait for clock_period;
+        entercode1 <= '1';
+        wait for clock_period*3;
+        -- voglio check_key_2 <= '1';
+        Enablekey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period*2;
+        code2 <= "0110";
+        wait for clock_period;
+        entercode2 <= '1';
+        wait for clock_period*3;
+        
+        --^^^controllo se avendo i 2 controllori a 1 la cassaforte si apre
 
-    	check_key_1 <= '0';
-		wait for clock_period*2;
-		check_key_1 <= '1';
-      wait for clock_period*2;
-		check_key_1 <= '0';
-		wait for clock_period*2;
-		check_key_2 <= '0';
-		wait for clock_period*5;
-		
-		check_key_1 <= '1';
-		wait for clock_period*2;
-		check_key_2 <= '1';
-		wait for clock_period*5;
-		timer_end <= '1';
-		wait for clock_period*2;
+
+        -- voglio il check_key_1 <= '0';
+        Enablekey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period*2;
+        code1 <= "1111";
+        wait for clock_period;
+        entercode1 <= '1';
+        wait for clock_period*3;
+        -- voglio check_key_2 <= '1';
+        Enablekey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period*2;
+        code2 <= "0110";
+        wait for clock_period;
+        entercode2 <= '1';
+        wait for clock_period*3;
+        
+        --^^^controllo se avendo 1 controllore a 0 e l'altro a 1 la cassaforte resti chiusa
+        
+        
+        -- voglio il check_key_1 <= '1';
+        Enablekey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period*2;
+        code1 <= "1010";
+        wait for clock_period;
+        entercode1 <= '1';
+        wait for clock_period*3;
+        -- voglio check_key_2 <= '0';
+        Enablekey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period*2;
+        code2 <= "1111";
+        wait for clock_period;
+        entercode2 <= '1';
+        wait for clock_period*3;
+        
+        --^^^controllo se avendo i 2 controllori a 0 la cassaforte resti chiusa
+        
+        -- voglio il check_key_1 <= '0';
+        Enablekey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period;
+        Bitkey1 <= '1';
+        wait for clock_period;
+        Bitkey1 <= '0';
+        wait for clock_period*2;
+        code1 <= "1111";
+        wait for clock_period;
+        entercode1 <= '1';
+        wait for clock_period*3;
+        -- voglio check_key_2 <= '0';
+        Enablekey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '1';
+        wait for clock_period;
+        Bitkey2 <= '0';
+        wait for clock_period*2;
+        code2 <= "1111";
+        wait for clock_period;
+        entercode2 <= '1';
+        wait for clock_period*3;
+        
+        --^^^controllo se avendo 1 controllore a 1 e l'altro a 0 la cassaforte resti chiusa
+      
+      
       wait;
    end process;
-
+	
 END;
