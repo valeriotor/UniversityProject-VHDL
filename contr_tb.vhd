@@ -30,8 +30,7 @@ ARCHITECTURE behavior OF contr_tb IS
               clock : in  STD_LOGIC;
               reset : in  STD_LOGIC;
               --uscisees
-              safe_open : out  STD_LOGIC;
-              timer_reset : out STD_LOGIC
+              safe_open : out  STD_LOGIC
         );
     END COMPONENT;
     
@@ -52,7 +51,6 @@ ARCHITECTURE behavior OF contr_tb IS
 
     --Outputs
    signal safe_open : std_logic;
-   signal timer_reset : std_logic;
 
    -- Clock period definitions
    constant clock_period : time := 10 ns;
@@ -74,8 +72,7 @@ BEGIN
           Enablekey2 => Enablekey2,
           EnterCode2 => EnterCode2,
           --outputs
-          safe_open => safe_open,
-          timer_reset => timer_reset
+          safe_open => safe_open
         );
 
    -- Clock process definitions
@@ -131,8 +128,11 @@ BEGIN
         wait for clock_period*3;
         
         --^^^controllo se avendo i 2 controllori a 1 la cassaforte si apre
-
-
+			enablekey1<='0';
+			wait for clock_period;
+			
+			--^^^controllo se la cassaforte si chiude levando la chiave
+			
         -- voglio il check_key_1 <= '0';
         Enablekey1 <= '1';
         wait for clock_period;
@@ -165,7 +165,11 @@ BEGIN
         wait for clock_period*3;
         
         --^^^controllo se avendo 1 controllore a 0 e l'altro a 1 la cassaforte resti chiusa
-        
+        	
+			reset <= '1';
+			wait for clock_period;
+			reset <= '0';
+			wait for clock_period;
         
         -- voglio il check_key_1 <= '1';
         Enablekey1 <= '1';
@@ -200,6 +204,11 @@ BEGIN
         
         --^^^controllo se avendo i 2 controllori a 0 la cassaforte resti chiusa
         
+		  reset <= '1';
+			wait for clock_period;
+			reset <= '0';
+			wait for clock_period;
+		  
         -- voglio il check_key_1 <= '0';
         Enablekey1 <= '1';
         wait for clock_period;

@@ -19,8 +19,7 @@ entity ControlloreMaster is
 			  -- ingressi della macchina
 			  clock : in  STD_LOGIC;
 			  reset : in  STD_LOGIC;
-			  safe_open : out  STD_LOGIC;
-			  timer_reset : out STD_LOGIC);
+			  safe_open : out  STD_LOGIC);
 end ControlloreMaster;
 
 architecture Behavioral of ControlloreMaster is
@@ -36,7 +35,7 @@ signal check_key_1,check_key_2 : STD_LOGIC;
 
 
 -- segnali interni per il timer
-signal timer_end,timer_start : STD_LOGIC;
+signal timer_end,timer_start,timer_reset : STD_LOGIC;
 
 
 -- componenti utilizzati all'interno del ControlloreMaster
@@ -63,7 +62,7 @@ C2: ControlloreSequenze
 
 T1: Timer 
 	generic map(5000000)
-	port map(Clock => clock, Reset => reset,Start => timer_start,Finished => timer_end);
+	port map(Clock => clock, Reset => timer_reset,Start => timer_start,Finished => timer_end);
 
 processo_sincrono:process(clock)
 begin
