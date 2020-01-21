@@ -40,10 +40,6 @@ ARCHITECTURE behavior OF ControlloreSequenze_TB IS
 	-- Utilizzato per facilitare il loop test
 	signal LoopVector : std_logic_vector(3 downto 0) := "0000";
 	
-	-- Utilizzato per debugging Post-Route. Lo controllo prima e dopo degli assert per aggiungere rispettivamente
-	-- un ritardo di 6 e 4 ns, così da tener conto del ritardo proprio della simulazione Post-Route.
-	signal PostRoute : boolean := false;
-	
     -- Component Declaration for the Unit Under Test (UUT)
  
     COMPONENT ControlloreSequenze
@@ -116,21 +112,15 @@ BEGIN
 		BitKey <= '1';
 		wait for Clock_period;
 		EnterCode <= '1';
-		wait for Clock_period*2;
-		if(PostRoute = true) then wait for 6 ns;	end if;
+		wait for Clock_period*3; -- Nota: in behavioral basterebbe Clock_period*2, ma aumento il ritardo per la simulazione post-route
 		assert (Success = '1') report "Incorrect output #1: expected 1, received " & std_logic'image(Success) severity error;
-		if(PostRoute = true) then wait for 4 ns;	end if;
 		Code <= "0001";
-		wait for Clock_period;
-		if(PostRoute = true) then wait for 6 ns;	end if;
+		wait for Clock_period*2;
 		assert (Success = '1') report "Incorrect output #2: expected 1, received " & std_logic'image(Success) severity error;
 		wait for Clock_period * 10;
-		if(PostRoute = true) then wait for 4 ns;	end if;
 		EnableKey <= '0';
-		wait for Clock_period;
-		if(PostRoute = true) then wait for 6 ns;	end if;
+		wait for Clock_period*2;
 		assert (Success = '0') report "Incorrect output #3: expected 0, received " & std_logic'image(Success) severity error;
-		if(PostRoute = true) then wait for 4 ns;	end if;
 		-- ^^ Semplice controllo iniziale per verificare che il componente funzioni a dovere. #1 verifica che l'output si alzi,
 		-- #2 verifica che l'output non si abbassi al cambiare del codice, #3 verifica che l'output si abbassi all'abbassarsi di
 		-- EnableKey (che nel componente principale coinciderà con il sensore della chiave).
@@ -147,14 +137,12 @@ BEGIN
 		BitKey <= '0';
 		wait for Clock_period;
 		EnterCode <= '1';		
-		wait for Clock_period*2;
-		if(PostRoute = true) then wait for 6 ns;	end if;
+		wait for Clock_period*3;
 		assert (Success = '0') report "Incorrect output #4: expected 0, received " & std_logic'image(Success) severity error;
 		-- ^^ Verifico che un codice sbagliato non alzi l'uscita.
 		
 		EnableKey <= '0';
 		wait for Clock_period;
-		if(PostRoute = true) then wait for 4 ns;	end if;
 		
 		for i in 0 to 15 loop
 			Code <= std_logic_vector(to_unsigned(i, Code'length));
@@ -173,9 +161,8 @@ BEGIN
 				BitKey <= LoopVector(3);
 				wait for Clock_Period;
 				EnterCode <= '1';
-				wait for Clock_Period*2;
+				wait for Clock_Period*3;
 						
-				if(PostRoute = true) then wait for 6 ns;	end if;
 				
 				if(Code = LoopVector) then
 					assert (Success = '1') report "Incorrect output #5: expected 1, received " & std_logic'image(Success) & " for i/j = " & integer'image(i) & "/" & integer'image(j) severity error;
@@ -186,7 +173,6 @@ BEGIN
 				EnableKey <= '0';
 				wait for Clock_Period;
 						
-				if(PostRoute = true) then wait for 4 ns;	end if;
 				
 			end loop;
 		end loop;
@@ -213,9 +199,8 @@ BEGIN
 				BitKey <= LoopVector(3);
 				wait for Clock_Period;
 				EnterCode <= '1';
-				wait for Clock_Period*2;				
+				wait for Clock_Period*3;				
 						
-				if(PostRoute = true) then wait for 6 ns;	end if;
 				
 				if(Code = LoopVector) then
 					assert (Success = '1') report "Incorrect output #6: expected 1, received " & std_logic'image(Success) & " for i/j = " & integer'image(i) & "/" & integer'image(j) severity error;
@@ -225,7 +210,6 @@ BEGIN
 				wait for Clock_Period;
 				EnableKey <= '0';
 				wait for Clock_Period;
-				if(PostRoute = true) then wait for 4 ns;	end if;
 			end loop;
 		end loop;
 		-- ^^ Effettuo direttamente un altro loop per verificare il componente in condizioni di sfasamento.
