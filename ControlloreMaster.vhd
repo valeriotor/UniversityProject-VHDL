@@ -61,8 +61,8 @@ C2: ControlloreSequenze
 	port map (Clock=> clock, Reset => reset, BitKey => Bitkey2, Code => code2, EnableKey => Enablekey2, EnterCode => EnterCode2, Success => check_key_2);
 
 T1: Timer 
-	generic map(5000000)
-	port map(Clock => clock, Reset => timer_reset,Start => timer_start,Finished => timer_end);
+	generic map(25)
+	port map(Clock => clock, Reset => timer_reset or reset,Start => timer_start,Finished => timer_end);
 
 processo_sincrono:process(clock)
 begin
@@ -98,14 +98,14 @@ timer_reset <= '0';
             end if;
             
         when S1 =>
-            if((check_key_1 = '1' xor check_key_2 = '1') and timer_end = '0') then
+				if(timer_end = '1') then
+                next_state <= S3;
+            elsif(check_key_1 = '1' xor check_key_2 = '1') then
                 next_state <= S1;
-            elsif(check_key_1 = '0' and check_key_2 = '0' and timer_end = '0') then
+            elsif(check_key_1 = '0' and check_key_2 = '0') then
                 next_state <= S0;
                 timer_reset <= '1';
-            elsif(timer_end = '1') then
-                next_state <= S3;
-            elsif(check_key_1 = '1' and check_key_2 = '1' and timer_end = '0') then
+            elsif(check_key_1 = '1' and check_key_2 = '1') then
                 next_state <= S2;
                 safe_open <= '1';
                 timer_reset <= '1';
@@ -127,8 +127,8 @@ timer_reset <= '0';
             end if;
             
         when S3 =>
-            if(check_key_1 = '0' and check_key_2 = '0') then
-		timer_reset <= '1';
+            if(check_key_1 = '0' and check_key_2 = '0') then 
+					 timer_reset <= '1';
                 next_state <= S0;
             else 
                 next_state <= S3;
