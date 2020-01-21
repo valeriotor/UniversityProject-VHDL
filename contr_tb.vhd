@@ -94,8 +94,13 @@ BEGIN
         reset <= '0';
         
       wait for clock_period*3;
+			
+			--La seguente riga può essere de-commentata per verificare il componente in condizioni di sfasamento.
+			--wait for 7 ns;
         
-        
+		  
+        code1 <= "0110";
+        code2 <= "0110";
         -- voglio il check_key_1 <= '1';
         Enablekey1 <= '1';
         wait for clock_period;
@@ -107,8 +112,6 @@ BEGIN
         wait for clock_period;
         Bitkey1 <= '0';
         wait for clock_period*2;
-        code1 <= "0110";
-        wait for clock_period;
         entercode1 <= '1';
         wait for clock_period*3;
         -- voglio check_key_2 <= '1';
@@ -122,18 +125,20 @@ BEGIN
         wait for clock_period;
         Bitkey2 <= '0';
         wait for clock_period*2;
-        code2 <= "0110";
-        wait for clock_period;
         entercode2 <= '1';
         wait for clock_period*3;
+        assert safe_open = '1' report "Incorrect output #1: expected 1, received " & std_logic'image(safe_open) severity error;
         
         --^^^controllo se avendo i 2 controllori a 1 la cassaforte si apre
 			enablekey1<='0';
-			wait for clock_period;
+			wait for clock_period*2;
+        assert safe_open = '0' report "Incorrect output #2: expected 0, received " & std_logic'image(safe_open) severity error;
 			
 			--^^^controllo se la cassaforte si chiude levando la chiave
 			
         -- voglio il check_key_1 <= '0';
+        code1 <= "1111";
+        code2 <= "0110";
         Enablekey1 <= '1';
         wait for clock_period;
         Bitkey1 <= '1';
@@ -144,8 +149,6 @@ BEGIN
         wait for clock_period;
         Bitkey1 <= '0';
         wait for clock_period*2;
-        code1 <= "1111";
-        wait for clock_period;
         entercode1 <= '1';
         wait for clock_period*3;
         -- voglio check_key_2 <= '1';
@@ -159,18 +162,17 @@ BEGIN
         wait for clock_period;
         Bitkey2 <= '0';
         wait for clock_period*2;
-        code2 <= "0110";
-        wait for clock_period;
         entercode2 <= '1';
         wait for clock_period*3;
-        
+        assert safe_open = '0' report "Incorrect output #3: expected 0, received " & std_logic'image(safe_open) severity error;
         --^^^controllo se avendo 1 controllore a 0 e l'altro a 1 la cassaforte resti chiusa
         	
-			reset <= '1';
-			wait for clock_period;
-			reset <= '0';
+			Enablekey1 <= '0';
+			Enablekey2 <= '0';
 			wait for clock_period;
         
+        code1 <= "1010";
+        code2 <= "1111";
         -- voglio il check_key_1 <= '1';
         Enablekey1 <= '1';
         wait for clock_period;
@@ -182,8 +184,6 @@ BEGIN
         wait for clock_period;
         Bitkey1 <= '0';
         wait for clock_period*2;
-        code1 <= "1010";
-        wait for clock_period;
         entercode1 <= '1';
         wait for clock_period*3;
         -- voglio check_key_2 <= '0';
@@ -197,19 +197,19 @@ BEGIN
         wait for clock_period;
         Bitkey2 <= '0';
         wait for clock_period*2;
-        code2 <= "1111";
-        wait for clock_period;
         entercode2 <= '1';
         wait for clock_period*3;
+        assert safe_open = '0' report "Incorrect output #4: expected 0, received " & std_logic'image(safe_open) severity error;
         
         --^^^controllo se avendo i 2 controllori a 0 la cassaforte resti chiusa
         
-		  reset <= '1';
-			wait for clock_period;
-			reset <= '0';
+			Enablekey1 <= '0';
+			Enablekey2 <= '0';
 			wait for clock_period;
 		  
-        -- voglio il check_key_1 <= '0';
+        code1 <= "1111";
+        code2 <= "1111";
+        -- voglio check_key_1 <= '0';
         Enablekey1 <= '1';
         wait for clock_period;
         Bitkey1 <= '1';
@@ -219,8 +219,6 @@ BEGIN
         Bitkey1 <= '1';
         wait for clock_period;
         Bitkey1 <= '0';
-        wait for clock_period*2;
-        code1 <= "1111";
         wait for clock_period;
         entercode1 <= '1';
         wait for clock_period*3;
@@ -234,15 +232,151 @@ BEGIN
         Bitkey2 <= '1';
         wait for clock_period;
         Bitkey2 <= '0';
-        wait for clock_period*2;
-        code2 <= "1111";
         wait for clock_period;
         entercode2 <= '1';
         wait for clock_period*3;
+        assert safe_open = '0' report "Incorrect output #5: expected 0, received " & std_logic'image(safe_open) severity error;
         
         --^^^controllo se avendo 1 controllore a 1 e l'altro a 0 la cassaforte resti chiusa
-      
-      
+			
+			-- ADDENDUM: Test aggiuntivi creati in data 21/01
+			
+			
+			Enablekey1 <= '0';
+			Enablekey2 <= '0';
+			wait for clock_period;
+			
+			code1 <= "0110";
+			code2 <= "0110";
+			Enablekey1 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			wait for clock_period;
+			entercode1 <= '1';
+			wait for clock_period*25;
+			Enablekey2 <= '1';
+			wait for clock_period;
+			Bitkey2 <= '0';
+			wait for clock_period;
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey2 <= '0';
+			wait for clock_period;
+			entercode2 <= '1';
+			wait for clock_period*3;
+			assert safe_open = '0' report "Incorrect output #6: expected 0, received " & std_logic'image(safe_open) severity error;
+			--^^ Questo test ha lo scopo di verificare se lo scadere del timer vieta effettivamente l'apertura della cassaforte. A scopo
+			-- di debugging la durata del timer è stata impostata a 25.
+			
+			Enablekey1 <= '0';
+			Enablekey2 <= '0';
+			wait for clock_period;
+			
+			code1 <= "0110";
+			code2 <= "0110";
+			Enablekey1 <= '1';
+			Enablekey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			Bitkey2 <= '0';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			Bitkey2 <= '0';
+			wait for clock_period;
+			entercode1 <= '1';
+			entercode2 <= '1';
+			wait for clock_period*3;
+			assert safe_open = '1' report "Incorrect output #7: expected 1, received " & std_logic'image(safe_open) severity error;
+			--^^ Questo test verifica che la cassaforte si apri se entrambi i controllori alzano il segnale al contempo
+			
+			Enablekey1 <= '0';
+			Enablekey2 <= '0';
+			wait for clock_period;
+			
+			code1 <= "0110";
+			code2 <= "0110";
+			Enablekey1 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			wait for clock_period;
+			entercode1 <= '1';
+			wait for clock_period*2;
+			Enablekey1 <= '0';
+			wait for clock_period*15;
+			Enablekey1 <= '1';
+			Enablekey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			Bitkey2 <= '0';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			Bitkey2 <= '0';
+			wait for clock_period;
+			entercode1 <= '1';
+			wait for clock_period*10; -- mi assicuro che sia nello stato S1 per un po'
+			entercode2 <= '1';
+			wait for clock_period*3;
+			assert safe_open = '1' report "Incorrect output #8: expected 1, received " & std_logic'image(safe_open) severity error;
+			--^^ Questo test verifica che, qualora una chiave dovesse essere messa e confermata, ma poi tolta prima dell'inserimento dell'altra, 
+			-- il timer si resetti correttamente.
+			-- Dunque dopo un certo numero di colpi di clock (15) dalla rimozione della chiave ritento di inserire le chiavi, assicurandomi di
+			-- impiegare *almeno* un'altra decina di colpi di clock. Se il timer di prima non si dovesse essere resettato, terminerebbe ora 
+			-- interrompendo l'apertura della cassaforte.
+			
+			Enablekey1 <= '0';
+			Enablekey2 <= '0';
+			wait for clock_period*15;
+			code1 <= "0110";
+			code2 <= "0110";
+			Enablekey1 <= '1';
+			Enablekey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			Bitkey2 <= '0';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '1';
+			Bitkey2 <= '1';
+			wait for clock_period;
+			Bitkey1 <= '0';
+			Bitkey2 <= '0';
+			wait for clock_period;
+			entercode1 <= '1';
+			wait for clock_period*12;
+			entercode2 <= '1';
+			wait for clock_period*3;
+			assert safe_open = '1' report "Incorrect output #9: expected 1, received " & std_logic'image(safe_open) severity error;
+			--^^ Questo test verifica (similmente all'ultimo test) il corretto reset del timer, ma stavolta nel caso dell'apertura della
+			-- cassaforte (e non della rimozione di una chiave quando si era in attesa dell'altra).
+			
       wait;
    end process;
 	
