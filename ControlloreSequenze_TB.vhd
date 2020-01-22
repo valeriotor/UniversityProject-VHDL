@@ -144,6 +144,9 @@ BEGIN
 		EnableKey <= '0';
 		wait for Clock_period;
 		
+		-- Decommentare la seguente riga di codice per aggiungere uno sfasamento
+		--wait for 4.55 ns;
+		
 		for i in 0 to 15 loop
 			Code <= std_logic_vector(to_unsigned(i, Code'length));
 			for j in 0 to 15 loop
@@ -177,42 +180,6 @@ BEGIN
 			end loop;
 		end loop;
 		-- ^^ Verifico tutte le 256 combinazioni tra chiave e codice (4 bit ciascuno => 16x16 comb.). 
-		
-		-- Aggiungo una fase di 7 nanosecondi per vedere come se la cava con segnali di clock sfasati.
-		wait for 7 ns;
-		report "INIZIO SECONDO LOOP" severity note;
-		
-		for i in 0 to 15 loop
-			Code <= std_logic_vector(to_unsigned(i, Code'length));
-			for j in 0 to 15 loop
-				LoopVector <= std_logic_vector(to_unsigned(j, LoopVector'length));
-				
-				EnableKey <= '1';
-				EnterCode <= '0';
-				wait for Clock_Period;
-				BitKey <= LoopVector(0);
-				wait for Clock_Period;
-				BitKey <= LoopVector(1);
-				wait for Clock_Period;
-				BitKey <= LoopVector(2);
-				wait for Clock_Period;
-				BitKey <= LoopVector(3);
-				wait for Clock_Period;
-				EnterCode <= '1';
-				wait for Clock_Period*3;				
-						
-				
-				if(Code = LoopVector) then
-					assert (Success = '1') report "Incorrect output #6: expected 1, received " & std_logic'image(Success) & " for i/j = " & integer'image(i) & "/" & integer'image(j) severity error;
-				else
-					assert (Success = '0') report "Incorrect output #6: expected 0, received " & std_logic'image(Success) & " for i/j = " & integer'image(i) & "/" & integer'image(j) severity error;
-				end if;
-				wait for Clock_Period;
-				EnableKey <= '0';
-				wait for Clock_Period;
-			end loop;
-		end loop;
-		-- ^^ Effettuo direttamente un altro loop per verificare il componente in condizioni di sfasamento.
 		
 		wait;
    end process;
