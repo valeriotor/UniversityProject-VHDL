@@ -44,7 +44,7 @@ architecture Behavioral of ControlloreSequenze is
 type state is (WAITING, READY, STEADY, NO_MATCH, MATCH);
 signal curr_state, next_state : state := WAITING;
 signal stored_key : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
-signal counter : integer := 0;
+signal counter : integer range 0 to 4 := 0;
  
 begin
 
