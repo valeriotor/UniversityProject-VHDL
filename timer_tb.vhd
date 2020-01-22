@@ -60,7 +60,9 @@ BEGIN
 		reset <= '1';
       wait for 100 ns;	
 		reset <= '0';
+		wait for 30 ns;
 		
+		report "Gli assert di questo testbench non sono adatti per simulazione post-route." severity note;
 		
 		start <= '1';
 		wait for clock_period * 1;
