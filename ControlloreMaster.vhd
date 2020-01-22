@@ -35,7 +35,7 @@ signal check_key_1,check_key_2 : STD_LOGIC;
 
 
 -- segnali interni per il timer
-signal timer_end,timer_start,timer_reset : STD_LOGIC;
+signal timer_end,timer_start,timer_reset, exitS1 : STD_LOGIC;
 
 
 -- componenti utilizzati all'interno del ControlloreMaster
@@ -62,7 +62,9 @@ C2: ControlloreSequenze
 
 T1: Timer 
 	generic map(25)
-	port map(Clock => clock, Reset => timer_reset or reset,Start => timer_start,Finished => timer_end);
+	port map(Clock => clock, Reset => timer_reset,Start => timer_start,Finished => timer_end);
+
+timer_reset <= exitS1 or reset;
 
 processo_sincrono:process(clock)
 begin
@@ -76,63 +78,64 @@ end if;
 end process;
 
 
-transizioni : process(curr_state,check_key_1,check_key_2,timer_end)
+transizioni : process(curr_state,check_key_1,check_key_2,timer_end, reset)
 begin
 --di norma le uscite sono basse
 timer_start <= '0';
 safe_open <= '0';
-timer_reset <= '0';
-
-    case(curr_state) is
-        when S0 => 
-            if(check_key_1 = '0' and check_key_2 = '0') then
-                next_state <= S0;
-            elsif(check_key_1 = '1' xor check_key_2 = '1') then --se una delle due è 1 entra, non se lo sono entrambe
-                next_state <= S1;
-                timer_start <= '1';
-            elsif(check_key_1 = '1' and check_key_2 = '1') then
-                next_state <= S2;
-                safe_open <= '1';
-            else
-                next_state <= S0;
-            end if;
-            
-        when S1 =>
-				if(timer_end = '1') then
-                next_state <= S3;
-            elsif(check_key_1 = '1' xor check_key_2 = '1') then
-                next_state <= S1;
-            elsif(check_key_1 = '0' and check_key_2 = '0') then
-                next_state <= S0;
-                timer_reset <= '1';
-            elsif(check_key_1 = '1' and check_key_2 = '1') then
-                next_state <= S2;
-                safe_open <= '1';
-                timer_reset <= '1';
-            else
-                next_state <= S3;
-            end if;
-            
-        when S2 =>
-            if(check_key_1 = '1' and check_key_2 = '1') then
-                next_state <= S2;
-                safe_open <= '1';
-            elsif(check_key_1 = '1' xor check_key_2 = '1') then
-                next_state <= S3;
-                safe_open <= '0';
-            else
-                next_state <= S0;
-            end if;
-            
-        when S3 =>
-            if(check_key_1 = '0' and check_key_2 = '0') then 
-                next_state <= S0;
-            else 
-                next_state <= S3;
-            end if;
-            
-    end case;
-    
+exitS1 <= '0';
+next_state <= S0;
+	if(reset = '0') then  
+		 case(curr_state) is
+			  when S0 => 
+					if(check_key_1 = '0' and check_key_2 = '0') then
+						 next_state <= S0;
+					elsif(check_key_1 = '1' xor check_key_2 = '1') then --se una delle due è 1 entra, non se lo sono entrambe
+						 next_state <= S1;
+						 timer_start <= '1';
+					elsif(check_key_1 = '1' and check_key_2 = '1') then
+						 next_state <= S2;
+						 safe_open <= '1';
+					else
+						 next_state <= S0;
+					end if;
+					
+			  when S1 =>
+					if(timer_end = '1') then
+						 next_state <= S3;
+					elsif(check_key_1 = '1' xor check_key_2 = '1') then
+						 next_state <= S1;
+					elsif(check_key_1 = '0' and check_key_2 = '0') then
+						 next_state <= S0;
+						 exitS1 <= '1';
+					elsif(check_key_1 = '1' and check_key_2 = '1') then
+						 next_state <= S2;
+						 safe_open <= '1';
+						 exitS1 <= '1';
+					else
+						 next_state <= S3;
+					end if;
+					
+			  when S2 =>
+					if(check_key_1 = '1' and check_key_2 = '1') then
+						 next_state <= S2;
+						 safe_open <= '1';
+					elsif(check_key_1 = '1' xor check_key_2 = '1') then
+						 next_state <= S3;
+						 safe_open <= '0';
+					else
+						 next_state <= S0;
+					end if;
+					
+			  when S3 =>
+					if(check_key_1 = '0' and check_key_2 = '0') then 
+						 next_state <= S0;
+					else 
+						 next_state <= S3;
+					end if;
+					
+		 end case;
+    end if;
 end process;
 
 end Behavioral;
