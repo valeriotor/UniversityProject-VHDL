@@ -120,15 +120,12 @@ timer_reset <= '0';
             elsif(check_key_1 = '1' xor check_key_2 = '1') then
                 next_state <= S3;
                 safe_open <= '0';
-            elsif(check_key_1 = '0' and check_key_2 = '0') then
-                next_state <= S0;
             else
-                next_state <= S3;
+                next_state <= S0;
             end if;
             
         when S3 =>
             if(check_key_1 = '0' and check_key_2 = '0') then 
-					 timer_reset <= '1';
                 next_state <= S0;
             else 
                 next_state <= S3;
