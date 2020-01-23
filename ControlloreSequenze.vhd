@@ -50,48 +50,38 @@ begin
 
 Mealy : process (curr_state, counter, EnterCode, EnableKey, Reset, Code, Stored_Key)
 begin
-	--if(rising_edge(Clock)) then
 	Success <= '0';
 	next_state <= WAITING;
-		if(Reset = '0' AND EnableKey = '1') then
---			next_state <= WAITING;
---			Success <= '0';
---			--report "Stored Key RES/ENABLE: " & std_logic'image(stored_key(3)) & std_logic'image(stored_key(2)) & std_logic'image(stored_key(1)) & std_logic'image(stored_key(0));			
---		else
-			--report "Stored Key: " & std_logic'image(stored_key(3)) & std_logic'image(stored_key(2)) & std_logic'image(stored_key(1)) & std_logic'image(stored_key(0));			
-		
-			-- TRANSIZIONI MEALY
-			case curr_state is
-				when WAITING =>
+	if(Reset = '0' AND EnableKey = '1') then 
+		-- TRANSIZIONI MEALY
+		case curr_state is
+			when WAITING =>
+				next_state <= READY;
+			when READY =>
+				if(counter = 4) then
+					next_state <= STEADY;
+				else
 					next_state <= READY;
-					--report "Timer Start/Timer End: " & std_logic'image(timer_start) & "/" & std_logic'image(timer_end);
-				when READY =>
-					--report "Timer Start/Timer End: " & std_logic'image(timer_start) & "/" & std_logic'image(timer_end);
-					if(counter = 4) then
-						next_state <= STEADY;
+				end if;
+			when STEADY =>
+				if(EnterCode = '1') then
+					if(Code = stored_key) then
+						next_state <= MATCH;
+						Success <= '1';
 					else
-						next_state <= READY;
+						next_state <= NO_MATCH;
 					end if;
-				when STEADY =>
-					if(EnterCode = '1') then
-						if(Code = stored_key) then
-							next_state <= MATCH;
-							Success <= '1';
-						else
-							next_state <= NO_MATCH;
-						end if;
-					else
-						next_state <= STEADY;
-					end if;
-				when MATCH =>
-					next_state <= MATCH;
-					Success <= '1';
-				when NO_MATCH =>
-					next_state <= NO_MATCH;
-			end case;
-			-- FINE TRANSIZIONI MEALY
-		end if;
-	--end if;	
+				else
+					next_state <= STEADY;
+				end if;
+			when MATCH =>
+				next_state <= MATCH;
+				Success <= '1';
+			when NO_MATCH =>
+				next_state <= NO_MATCH;
+		end case;
+		-- FINE TRANSIZIONI MEALY
+	end if;	
 end process;
 
 StateChange : process (Clock)
