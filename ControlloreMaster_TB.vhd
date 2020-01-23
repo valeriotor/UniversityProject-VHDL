@@ -5,10 +5,10 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY contr_tb IS
-END contr_tb;
+ENTITY ControlloreMaster_TB IS
+END ControlloreMaster_TB;
  
-ARCHITECTURE behavior OF contr_tb IS 
+ARCHITECTURE behavior OF ControlloreMaster_TB IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
